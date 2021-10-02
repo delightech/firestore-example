@@ -15,14 +15,13 @@
  */
 "use strict";
 
-FriendlyEats.prototype.addRestaurant = function(data) {
-  var collection = firebase.firestore().collection("restaurants");
+FriendlyEats.prototype.addRestaurant = function(data, db) {
+  var collection = db.collection("restaurants");
   return collection.add(data);
 };
 
-FriendlyEats.prototype.getAllRestaurants = function(renderer) {
-  var query = firebase
-    .firestore()
+FriendlyEats.prototype.getAllRestaurants = function(renderer, db) {
+  var query = db
     .collection("restaurants")
     .orderBy("avgRating", "desc")
     .limit(50);
@@ -46,16 +45,19 @@ FriendlyEats.prototype.getDocumentsInQuery = function(query, renderer) {
   });
 };
 
-FriendlyEats.prototype.getRestaurant = function(id) {
-  return firebase
-    .firestore()
+FriendlyEats.prototype.getRestaurant = function(id, db) {
+  return db
     .collection("restaurants")
     .doc(id)
     .get();
 };
 
-FriendlyEats.prototype.getFilteredRestaurants = function(filters, renderer) {
-  var query = firebase.firestore().collection("restaurants");
+FriendlyEats.prototype.getFilteredRestaurants = function(
+  filters,
+  renderer,
+  db
+) {
+  var query = db.collection("restaurants");
 
   if (filters.category !== "Any") {
     query = query.where("category", "==", filters.category);
@@ -78,12 +80,12 @@ FriendlyEats.prototype.getFilteredRestaurants = function(filters, renderer) {
   this.getDocumentsInQuery(query, renderer);
 };
 
-FriendlyEats.prototype.addRating = function(restaurantID, rating) {
-  var collection = firebase.firestore().collection("restaurants");
+FriendlyEats.prototype.addRating = function(restaurantID, db, rating) {
+  var collection = db.collection("restaurants");
   var document = collection.doc(restaurantID);
   var newRatingDocument = document.collection("ratings").doc();
 
-  return firebase.firestore().runTransaction(function(transaction) {
+  return db.runTransaction(function(transaction) {
     return transaction.get(document).then(function(doc) {
       var data = doc.data();
 
